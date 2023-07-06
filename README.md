@@ -1,2 +1,2 @@
 # TaskManagerApp
-![App Screenshot](../public/TaskApp.png)
+![App Screenshot](./public/TaskApp.png)
