@@ -4,7 +4,7 @@ import "../App.css";
 function Form1() {
   const titleRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
-  const categoryRef = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
   const [tableData, setTableData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -29,8 +29,6 @@ function Form1() {
       dateRef.current?.value &&
       categoryRef.current?.value
     ) {
-      alert("Thanks for the input!");
-
       const newData = {
         title: titleRef.current!.value,
         date: dateRef.current!.value,
@@ -81,13 +79,16 @@ function Form1() {
           <label htmlFor="category" className="form-label">
             Category
           </label>
-          <input
-            ref={categoryRef}
+          <select
             id="category"
-            type="text"
             className="form-control"
             required
-          />
+            ref={categoryRef}
+          >
+            <option>Groceries</option>
+            <option>Utilities</option>
+            <option>Enterteinment</option>
+          </select>
         </div>
         <button className="submit-button" onClick={handleClickSubmit}>
           Submit
