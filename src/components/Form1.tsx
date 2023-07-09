@@ -1,8 +1,29 @@
-import { FormEvent, useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import "../App.css";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+
+const schema = z.object({
+  title: z
+    .string()
+    .nonempty({ message: "Must enter a title" })
+    .min(3, "Title must be at least 3 characters long")
+    .max(50, "Title cannot exceed 50 characters"),
+});
+
+type FormData = z.infer<typeof schema>;
 
 function Form1() {
-  const titleRef = useRef<HTMLInputElement>(null);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
   const dateRef = useRef<HTMLInputElement>(null);
   const categoryRef = useRef<HTMLSelectElement>(null);
   const [tableData, setTableData] = useState<any[]>([]);
@@ -21,76 +42,56 @@ function Form1() {
     localStorage.setItem("tableData", JSON.stringify(updatedData));
   };
 
-  const handleClickSubmit = (event: FormEvent) => {
-    event.preventDefault();
+  const onSubmit = (data: FormData) => {
+    const newData = {
+      title: data.title,
+      date: dateRef.current!.value,
+      category: categoryRef.current!.value,
+    };
 
-    if (
-      titleRef.current?.value &&
-      dateRef.current?.value &&
-      categoryRef.current?.value
-    ) {
-      const newData = {
-        title: titleRef.current!.value,
-        date: dateRef.current!.value,
-        category: categoryRef.current!.value,
-      };
+    const updatedData = [...tableData, newData];
+    setTableData(updatedData);
+    localStorage.setItem("tableData", JSON.stringify(updatedData));
 
-      const updatedData = [...tableData, newData];
-      setTableData(updatedData);
-      localStorage.setItem("tableData", JSON.stringify(updatedData));
-
-      titleRef.current!.value = "";
-      dateRef.current!.value = "";
-      categoryRef.current!.value = "";
-    } else {
-      alert("You must fill in all the input fields.");
-    }
+    reset();
   };
 
   return (
     <div className="form-container">
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">
             Title
           </label>
           <input
-            ref={titleRef}
             id="title"
             type="text"
             className="form-control"
-            required
+            {...register("title")}
           />
+          {errors.title && (
+            <p className="error-message">{errors.title.message}</p>
+          )}
         </div>
 
         <div className="mb-3">
           <label htmlFor="date" className="form-label">
             Due Date
           </label>
-          <input
-            ref={dateRef}
-            id="date"
-            type="date"
-            className="form-control"
-            required
-          />
+          <input ref={dateRef} id="date" type="date" className="form-control" />
         </div>
         <div className="mb-3">
           <label htmlFor="category" className="form-label">
             Category
           </label>
-          <select
-            id="category"
-            className="form-control"
-            required
-            ref={categoryRef}
-          >
+          <select id="category" className="form-control" ref={categoryRef}>
+            <option></option>
             <option>Groceries</option>
             <option>Utilities</option>
-            <option>Enterteinment</option>
+            <option>Entertainment</option>
           </select>
         </div>
-        <button className="submit-button" onClick={handleClickSubmit}>
+        <button type="submit" className="submit-button">
           Submit
         </button>
       </form>

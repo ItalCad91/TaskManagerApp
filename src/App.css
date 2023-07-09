@@ -66,6 +66,12 @@
   background-color: #0056b3;
 }
 
+.error-message {
+  color: red;
+}
+
+
+
 /* TABLE CSS */
 
 .table {
@@ -89,3 +95,4 @@
 .table tbody tr:last-child td {
   border-bottom: none;
 }
+
